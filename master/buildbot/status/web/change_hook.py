@@ -120,8 +120,14 @@ class ChangeHookResource(resource.Resource):
             dialect = 'base'
 
         if dialect in self.dialects.keys():
-            log.msg("Attempting to load module buildbot.status.web.hooks." + dialect)
-            tempModule = namedModule('buildbot.status.web.hooks.' + dialect)
+            config = self.dialects[dialect]
+            module = 'buildbot.status.web.hooks'
+            try:
+                module = config["module"]
+            except (KeyError, TypeError):
+                pass
+            log.msg("Attempting to load module " + module + "." + dialect)
+            tempModule = namedModule(module + '.' + dialect)
             changes, src = tempModule.getChanges(request, self.dialects[dialect])
             log.msg("Got the following changes %s" % changes)
             self.request_dialect = dialect
